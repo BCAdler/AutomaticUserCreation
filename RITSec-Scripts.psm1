@@ -7,25 +7,25 @@
 #>
 
 <#
- .SYNOPSIS
- Automates adding of new users to the RITSec Infrastructure.
- 
- .DESCRIPTION
- Automates adding of new users to the RITSec Infrastructure as well as creating
- a vApp for that user and giving them the correct permissions to be able to access
- their own vApp as well as networks that general users are allowed to use.
- 
- .PARAMETER FirstName
- First name of user to be added.
- 
- .PARAMETER LastName
- Last name of user to be added.
- 
- .PARAMETER Email
- RIT email of user to be added.  Must be in abc1234@g.rit.edu format.
- 
- .EXAMPLE
- Add-RITSecUser -FirstName Joe -LastName Graham jxg5678@g.rit.edu
+    .SYNOPSIS
+    Automates adding of new users to the RITSec Infrastructure.
+
+    .DESCRIPTION
+    Automates adding of new users to the RITSec Infrastructure as well as creating
+    a vApp for that user and giving them the correct permissions to be able to access
+    their own vApp as well as networks that general users are allowed to use.
+
+    .PARAMETER FirstName
+    First name of user to be added.
+
+    .PARAMETER LastName
+    Last name of user to be added.
+
+    .PARAMETER Email
+    RIT email of user to be added.  Must be in abc1234@g.rit.edu format.
+
+    .EXAMPLE
+    Add-RITSecUser -FirstName Joe -LastName Graham jxg5678@g.rit.edu
 #>
 function Add-User {
     Param (
@@ -44,33 +44,33 @@ function Add-User {
 }
 
 <#
- .SYNOPSIS
- Adds user to RITSec AD and adds new user to necessary groups.
- 
- .DESCRIPTION
- Adds user to RITSec Active Directory and adds the new user to necessary groups.  
- Details of current configuration in Notes section below.
- 
- .PARAMETER FirstName
- First name of user to be added.
- 
- .PARAMETER LastName
- Last name of user to be added.
- 
- .PARAMETER Email
- RIT email of user to be added.  Must be in abc1234@g.rit.edu format.
+    .SYNOPSIS
+    Adds user to RITSec AD and adds new user to necessary groups.
 
- .PARAMETER OverrideRITEmail
- Used to add a user without an RIT email.
- 
- .EXAMPLE
- Add-RITSecADUser -FirstName Joe -LastName Graham jxg5678@g.rit.edu
- 
- .NOTES
- Current Configuration:
- Primary Domain Controller: quill.galaxy.ritsec
- General User OU: OU=Datacenter,DC=galaxy,DC=ritsec
- Default Groups Users Are Added To: vCenter Users, VPN Users
+    .DESCRIPTION
+    Adds user to RITSec Active Directory and adds the new user to necessary groups.  
+    Details of current configuration in Notes section below.
+
+    .PARAMETER FirstName
+    First name of user to be added.
+
+    .PARAMETER LastName
+    Last name of user to be added.
+
+    .PARAMETER Email
+    RIT email of user to be added.  Must be in abc1234@g.rit.edu format.
+
+    .PARAMETER OverrideRITEmail
+    Used to add a user without an RIT email.
+
+    .EXAMPLE
+    Add-RITSecADUser -FirstName Joe -LastName Graham jxg5678@g.rit.edu
+
+    .NOTES
+    Current Configuration:
+    Primary Domain Controller: quill.galaxy.ritsec
+    General User OU: OU=Datacenter,DC=galaxy,DC=ritsec
+    Default Groups Users Are Added To: vCenter Users, VPN Users
 #>
 function Add-ADUser {
     Param (
@@ -186,43 +186,43 @@ function Add-VApp {
 }
 
 <#
- .Synopsis
-     Generates one or more complex passwords designed to fulfill the requirements for Active Directory
- .DESCRIPTION
-     Generates one or more complex passwords designed to fulfill the requirements for Active Directory
- .EXAMPLE
-     New-SWRandomPassword
-     C&3SX6Kn
- 
-     Will generate one password with a length between 8  and 12 chars.
- .EXAMPLE
-     New-SWRandomPassword -MinPasswordLength 8 -MaxPasswordLength 12 -Count 4
-     7d&5cnaB
-     !Bh776T"Fw
-     9"C"RxKcY
-     %mtM7#9LQ9h
- 
-     Will generate four passwords, each with a length of between 8 and 12 chars.
- .EXAMPLE
-     New-SWRandomPassword -InputStrings abc, ABC, 123 -PasswordLength 4
-     3ABa
- 
-     Generates a password with a length of 4 containing atleast one char from each InputString
- .EXAMPLE
-     New-SWRandomPassword -InputStrings abc, ABC, 123 -PasswordLength 4 -FirstChar abcdefghijkmnpqrstuvwxyzABCEFGHJKLMNPQRSTUVWXYZ
-     3ABa
- 
-     Generates a password with a length of 4 containing atleast one char from each InputString that will start with a letter from 
-     the string specified with the parameter FirstChar
- .OUTPUTS
-     [String]
- .NOTES
-     Written by Simon Wåhlin, blog.simonw.se
-     I take no responsibility for any issues caused by this script.
- .FUNCTIONALITY
-     Generates random passwords
- .LINK
-     http://blog.simonw.se/powershell-generating-random-password-for-active-directory/
+    .Synopsis
+        Generates one or more complex passwords designed to fulfill the requirements for Active Directory
+    .DESCRIPTION
+        Generates one or more complex passwords designed to fulfill the requirements for Active Directory
+    .EXAMPLE
+        New-SWRandomPassword
+        C&3SX6Kn
+
+        Will generate one password with a length between 8  and 12 chars.
+    .EXAMPLE
+        New-SWRandomPassword -MinPasswordLength 8 -MaxPasswordLength 12 -Count 4
+        7d&5cnaB
+        !Bh776T"Fw
+        9"C"RxKcY
+        %mtM7#9LQ9h
+
+        Will generate four passwords, each with a length of between 8 and 12 chars.
+    .EXAMPLE
+        New-SWRandomPassword -InputStrings abc, ABC, 123 -PasswordLength 4
+        3ABa
+
+        Generates a password with a length of 4 containing atleast one char from each InputString
+    .EXAMPLE
+        New-SWRandomPassword -InputStrings abc, ABC, 123 -PasswordLength 4 -FirstChar abcdefghijkmnpqrstuvwxyzABCEFGHJKLMNPQRSTUVWXYZ
+        3ABa
+
+        Generates a password with a length of 4 containing atleast one char from each InputString that will start with a letter from 
+        the string specified with the parameter FirstChar
+    .OUTPUTS
+        [String]
+    .NOTES
+        Written by Simon Wåhlin, blog.simonw.se
+        I take no responsibility for any issues caused by this script.
+    .FUNCTIONALITY
+        Generates random passwords
+    .LINK
+        http://blog.simonw.se/powershell-generating-random-password-for-active-directory/
 #>
 function New-SWRandomPassword {
     
