@@ -43,6 +43,13 @@ function Add-User {
     Add-VApp -UserName $UserName
 }
 
+function Add-ProjectMember {
+    Param (
+        [Parameter(Mandatory=$true)][string]$Project,
+        [Parameter(Mandatory=$true)][string]$Username
+    )
+}
+
 <#
     .SYNOPSIS
     Adds user to RITSec AD and adds new user to necessary groups.
