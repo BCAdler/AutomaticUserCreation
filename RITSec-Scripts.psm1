@@ -37,10 +37,10 @@ function Add-User {
     $UserName = $FirstName[0] + $LastName
 
     # Create user account in AD
-    Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email
+    Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email -ErrorAction Stop
 
     # Creates a vApp for the user.
-    Add-VApp -UserName $UserName
+    Add-VApp -UserName $UserName -ErrorAction Stop
 }
 
 function Add-ProjectMember {
@@ -89,11 +89,11 @@ function Add-ADUser {
     # Validate user input for Email is an RIT email
     # Added an option to override (just in case)
     try {
-        New-Object -TypeName System.Net.Mail.MailAddress -ArgumentList $Email
+        New-Object -TypeName System.Net.Mail.MailAddress -ArgumentList $Email | Out-Null
     }
     catch {
         Write-Error "The email address entered is not in the form required for an e-mail address."
-        exit
+        return
     }
 
     # Temp var for string after the "@" in the address
@@ -113,7 +113,7 @@ function Add-ADUser {
             }
             else {
                 Write-Error "Non-RIT e-mail address entered.  Either enter an RIT e-mail address or override if necessary."
-                exit
+                return
             }
         }
     }
@@ -128,15 +128,15 @@ function Add-ADUser {
     $TempPassword = New-SWRandomPassword -PasswordLength 20
     New-ADUser -Name $FullName -GivenName $FirstName -Surname $LastName -AccountPassword (ConvertTo-SecureString -String $TempPassword -AsPlainText -Force) `
             -EmailAddress $Email -SamAccountName $UserName -Enabled $true -Path "OU=Datacenter,DC=galaxy,DC=ritsec" `
-            -ChangePasswordAtLogon $false -DisplayName $FullName -UserPrincipalName "$UserName@galaxy.ritsec"
+            -ChangePasswordAtLogon $false -DisplayName $FullName -UserPrincipalName "$UserName@galaxy.ritsec" -
     
     # Add new user to necessary groups
     Add-ADGroupMember -Identity "vCenter Users" -Members $UserName
     Add-ADGroupMember -Identity "VPN Users" -Members $UserName
 
     # Output overview of the actions above with relevant information
-    Write-Host "Account Creation Output:" -ForegroundColor Green
-    Write-Host "`nNew Account: $Username"
+    Write-Host "`nAccount Creation Output:" -ForegroundColor Green
+    Write-Host "New Account: $Username"
     Write-Host "Email: $Email"
     Write-Host "Groups added to: vCenter Users, VPN Users"
     Write-Host "Temporary Password: $TempPassword`n"
@@ -190,6 +190,37 @@ function Add-VApp {
     Write-Host "Folder Name: $UserName's folder"
     Write-Host "User allowed access: $DomainAlias\$UserName"
     Write-Host "Role Given to user: $RoleName"
+}
+
+<#
+    .SYNOPSIS
+    Short description
+
+    .DESCRIPTION
+    Long description
+
+    .PARAMETER Identity
+    Parameter description
+
+    .EXAMPLE
+    An example
+
+    .NOTES
+    General notes
+#>
+function Remove-User {
+    Param (
+        [Parameter(Mandatory=$true)][string]$Identity,
+        [switch]$PreserveVApp = $false
+    )
+
+    # Remove User from AD
+    Remove-ADUser -Identity $Identity -Confirm:$false
+
+    if(!$PreserveVApp) {
+        $VApp = Get-VApp -Name $Identity
+        Remove-VApp -VApp $VApp -DeletePermanently -Confirm:$false
+    }    
 }
 
 <#
