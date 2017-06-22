@@ -38,6 +38,7 @@ function Add-User {
 
     # Create user account in AD
     Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email -ErrorAction Stop
+    
 
     # Creates a vApp for the user.
     Add-VApp -UserName $UserName -ErrorAction Stop
@@ -109,7 +110,7 @@ function Add-ADUser {
         }
         else {
             if($OverrideRITEmail) {
-                Write-Host "You have overrided the RIT email check! Adding non-RIT account." -ForegroundColor Yellow
+                Write-Warning -Message "You have overrided the RIT email check! Adding non-RIT account."
             }
             else {
                 Write-Error "Non-RIT e-mail address entered.  Either enter an RIT e-mail address or override if necessary."
@@ -126,10 +127,19 @@ function Add-ADUser {
 
     # Add new user with specified parameters to AD.
     $TempPassword = New-SWRandomPassword -PasswordLength 20
-    New-ADUser -Name $FullName -GivenName $FirstName -Surname $LastName -AccountPassword (ConvertTo-SecureString -String $TempPassword -AsPlainText -Force) `
+    try {
+        New-ADUser -Name $FullName -GivenName $FirstName -Surname $LastName -AccountPassword (ConvertTo-SecureString -String $TempPassword -AsPlainText -Force) `
             -EmailAddress $Email -SamAccountName $UserName -Enabled $true -Path "OU=Datacenter,DC=galaxy,DC=ritsec" `
-            -ChangePasswordAtLogon $false -DisplayName $FullName -UserPrincipalName "$UserName@galaxy.ritsec" -
-    
+            -ChangePasswordAtLogon $false -DisplayName $FullName -UserPrincipalName "$UserName@galaxy.ritsec"
+    }
+    catch [Microsoft.ActiveDirectory.Management.ADIdentityAlreadyExistsException] {
+        Write-Warning -Message "The specified account ($UserName) already exists.  Continuing..."
+        return
+    }
+    catch {
+        Write-Error $_ 
+        return
+    }
     # Add new user to necessary groups
     Add-ADGroupMember -Identity "vCenter Users" -Members $UserName
     Add-ADGroupMember -Identity "VPN Users" -Members $UserName
