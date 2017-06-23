@@ -39,7 +39,6 @@ function Add-User {
 
     # Create user account in AD
     Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email -OverrideRITEmail:$OverrideRITEmail -ErrorAction Stop
-    
 
     # Creates a vApp for the user.
     Add-VApp -UserName $UserName -ErrorAction Stop
@@ -69,6 +68,9 @@ function Add-ProjectMember {
     .PARAMETER Email
     RIT email of user to be added.  Must be in abc1234@g.rit.edu format.
 
+    .PARAMETER AdditionalGroups
+    A list of additional groups the user should be added to. Default groups in notes.
+
     .PARAMETER OverrideRITEmail
     Used to add a user without an RIT email.
 
@@ -78,7 +80,7 @@ function Add-ProjectMember {
     .NOTES
     Current Configuration:
     Primary Domain Controller: quill.galaxy.ritsec
-    General User OU: OU=Datacenter,DC=galaxy,DC=ritsec
+    General User OU: OU=Users,OU=Datacenter,DC=galaxy,DC=ritsec
     Default Groups Users Are Added To: vCenter Users, VPN Users
 #>
 function Add-ADUser {
@@ -86,6 +88,7 @@ function Add-ADUser {
         [Parameter(Mandatory=$true)][string]$FirstName,
         [Parameter(Mandatory=$true)][string]$LastName,
         [Parameter(Mandatory=$true)][string]$Email,
+        [string[]]$AdditionalGroups,
         [switch]$OverrideRITEmail
     )
     # Validate user input for Email is an RIT email
@@ -141,9 +144,15 @@ function Add-ADUser {
         Write-Error $_ 
         return
     }
+
+    # Combining Default groups with AdditionalGroups
+    $DefaultGroups = "vCenter Users","VPN Users"
+    $DefaultGroups += $AdditionalGroups
+
     # Add new user to necessary groups
-    Add-ADGroupMember -Identity "vCenter Users" -Members $UserName
-    Add-ADGroupMember -Identity "VPN Users" -Members $UserName
+    foreach($Group in $DefaultGroups) {
+        Add-ADGroupMember -Identity $Group -Members $UserName
+    }
 
     # Output overview of the actions above with relevant information
     Write-Host "`nAccount Creation Output:" -ForegroundColor Green
