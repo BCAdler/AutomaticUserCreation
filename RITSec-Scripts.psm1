@@ -129,7 +129,7 @@ function Add-ADUser {
     $TempPassword = New-SWRandomPassword -PasswordLength 20
     try {
         New-ADUser -Name $FullName -GivenName $FirstName -Surname $LastName -AccountPassword (ConvertTo-SecureString -String $TempPassword -AsPlainText -Force) `
-            -EmailAddress $Email -SamAccountName $UserName -Enabled $true -Path "OU=Datacenter,DC=galaxy,DC=ritsec" `
+            -EmailAddress $Email -SamAccountName $UserName -Enabled $true -Path "OU=Users,OU=Datacenter,DC=galaxy,DC=ritsec" `
             -ChangePasswordAtLogon $false -DisplayName $FullName -UserPrincipalName "$UserName@galaxy.ritsec"
     }
     catch [Microsoft.ActiveDirectory.Management.ADIdentityAlreadyExistsException] {
