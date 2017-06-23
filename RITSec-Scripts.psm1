@@ -31,13 +31,14 @@ function Add-User {
     Param (
         [Parameter(Mandatory=$true)][string]$FirstName,
         [Parameter(Mandatory=$true)][string]$LastName,
-        [Parameter(Mandatory=$true)][string]$Email
+        [Parameter(Mandatory=$true)][string]$Email,
+        [switch]$OverrideRITEmail
     )
     # Parse input for vApp Name
     $UserName = $FirstName[0] + $LastName
 
     # Create user account in AD
-    Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email -ErrorAction Stop
+    Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email -OverrideRITEmail:$OverrideRITEmail -ErrorAction Stop
     
 
     # Creates a vApp for the user.
@@ -110,7 +111,7 @@ function Add-ADUser {
         }
         else {
             if($OverrideRITEmail) {
-                Write-Warning -Message "You have overrided the RIT email check! Adding non-RIT account."
+                Write-Warning -Message "You have overridden the RIT email check! Adding non-RIT account."
             }
             else {
                 Write-Error "Non-RIT e-mail address entered.  Either enter an RIT e-mail address or override if necessary."
@@ -180,7 +181,7 @@ function Add-VApp {
     $Role = Get-VIRole -Name $RoleName
 
     # Create folder for the user
-    $NewFolder = New-Folder -Name "$UserName's folder" -Location $UserFolder
+    $NewFolder = New-Folder -Name "$UserName's Folder" -Location $UserFolder
 
     # Assign new user permissions to access folder
     New-VIPermission -Entity $NewFolder -Role $Role -Principal "$DomainAlias\$UserName"
@@ -197,7 +198,7 @@ function Add-VApp {
     # Output overview of the actions above with relevant information
     Write-Host "`nvApp Creation Output:" -ForegroundColor Green
     Write-Host "vApp Name: $($VApp.Name)"
-    Write-Host "Folder Name: $UserName's folder"
+    Write-Host "Folder Name: $UserName's Folder"
     Write-Host "User allowed access: $DomainAlias\$UserName"
     Write-Host "Role Given to user: $RoleName"
 }
