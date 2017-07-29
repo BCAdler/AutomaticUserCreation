@@ -177,7 +177,7 @@ function Add-ADUser {
  .EXAMPLE
  Add-RITSecVApp -Name "jgraham"
 #>
-function Add-VApp {
+function Add-ResourcePool {
     Param (
         [Parameter(Mandatory=$true)][string]$UserName
     )
@@ -196,17 +196,17 @@ function Add-VApp {
     New-VIPermission -Entity $NewFolder -Role $Role -Principal "$DomainAlias\$UserName"
 
     # Create vApp
-    $VApp = New-VApp -Name $UserName -Location (Get-Cluster)[0]
+    $ResourcePool = New-ResourcePool -Name $UserName -Location (Get-Cluster)[0]
 
     # Move vApp into folder created above
-    Move-VApp -VApp $VApp -Destination $NewFolder
+    Move-ResourcePool -ResourcePool $ResourcePool -Destination $NewFolder
 
     # Assign new user permissions to access vApp
-    New-VIPermission -Entity $VApp -Role $role -Principal "$DomainAlias\$UserName"
+    New-VIPermission -Entity $ResourcePool -Role $role -Principal "$DomainAlias\$UserName"
 
     # Output overview of the actions above with relevant information
     Write-Host "`nvApp Creation Output:" -ForegroundColor Green
-    Write-Host "vApp Name: $($VApp.Name)"
+    Write-Host "vApp Name: $($ResourcePool.Name)"
     Write-Host "Folder Name: $UserName's Folder"
     Write-Host "User allowed access: $DomainAlias\$UserName"
     Write-Host "Role Given to user: $RoleName"
