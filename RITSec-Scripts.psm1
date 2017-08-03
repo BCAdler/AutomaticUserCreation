@@ -41,7 +41,7 @@ function Add-User {
     Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email -OverrideRITEmail:$OverrideRITEmail -ErrorAction Stop
 
     # Creates a vApp for the user.
-    Add-VApp -UserName $UserName -ErrorAction Stop
+    Add-ResourcePool -UserName $UserName -ErrorAction Stop
 }
 
 function Add-ProjectMember {
