@@ -32,13 +32,14 @@ function Add-User {
         [Parameter(Mandatory=$true)][string]$FirstName,
         [Parameter(Mandatory=$true)][string]$LastName,
         [Parameter(Mandatory=$true)][string]$Email,
+        [string[]]$AdditionalGroups = $null,
         [switch]$OverrideRITEmail
     )
     # Parse input for vApp Name
     $UserName = $FirstName[0] + $LastName
 
     # Create user account in AD
-    Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email -OverrideRITEmail:$OverrideRITEmail -ErrorAction Stop
+    Add-ADUser -FirstName $FirstName -LastName $LastName -Email $Email -AdditionalGroups $AdditionalGroups -OverrideRITEmail:$OverrideRITEmail -ErrorAction Stop
 
     # Creates a vApp for the user.
     Add-ResourcePool -UserName $UserName -ErrorAction Stop
@@ -88,7 +89,7 @@ function Add-ADUser {
         [Parameter(Mandatory=$true)][string]$FirstName,
         [Parameter(Mandatory=$true)][string]$LastName,
         [Parameter(Mandatory=$true)][string]$Email,
-        [string[]]$AdditionalGroups,
+        [string[]]$AdditionalGroups = $null,
         [switch]$OverrideRITEmail
     )
     # Validate user input for Email is an RIT email
@@ -147,7 +148,9 @@ function Add-ADUser {
 
     # Combining Default groups with AdditionalGroups
     $DefaultGroups = "vCenter Users","VPN Users"
-    $DefaultGroups += $AdditionalGroups
+    if($AdditionalGroups -ne $null) {
+        $DefaultGroups += $AdditionalGroups
+    }
 
     # Add new user to necessary groups
     foreach($Group in $DefaultGroups) {
@@ -158,7 +161,7 @@ function Add-ADUser {
     Write-Host "`nAccount Creation Output:" -ForegroundColor Green
     Write-Host "New Account: $Username"
     Write-Host "Email: $Email"
-    Write-Host "Groups added to: vCenter Users, VPN Users"
+    Write-Host "Groups added to: $DefaultGroups"
     Write-Host "Temporary Password: $TempPassword`n"
 }
 
@@ -198,9 +201,6 @@ function Add-ResourcePool {
     # Create vApp
     $ResourcePool = New-ResourcePool -Name $UserName -Location (Get-Cluster)[0]
 
-    # Move vApp into folder created above
-    Move-ResourcePool -ResourcePool $ResourcePool -Destination $NewFolder
-
     # Assign new user permissions to access vApp
     New-VIPermission -Entity $ResourcePool -Role $role -Principal "$DomainAlias\$UserName"
 
@@ -231,15 +231,21 @@ function Add-ResourcePool {
 function Remove-User {
     Param (
         [Parameter(Mandatory=$true)][string]$Identity,
-        [switch]$PreserveVApp = $false
+        [switch]$PreserveFolder = $false,
+        [switch]$PreserveRPool = $false
     )
 
     # Remove User from AD
     Remove-ADUser -Identity $Identity -Confirm:$false
 
+    if(!$PreserveFolder) {
+        $Folder = Get-Folder -Name $Identity
+        Remove-Folder -Folder $Folder -Confirm:$false
+    }
+
     if(!$PreserveVApp) {
-        $VApp = Get-VApp -Name $Identity
-        Remove-VApp -VApp $VApp -DeletePermanently -Confirm:$false
+        $RPool = Get-ResourcePool -Name $Identity
+        Remove-ResourcePool -ResourcePool $RPool -Confirm:$false
     }    
 }
 
