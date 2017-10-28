@@ -45,6 +45,25 @@ function Add-User {
     Add-ResourcePool -UserName $UserName -ErrorAction Stop
 }
 
+<#
+.SYNOPSIS
+Short description
+
+.DESCRIPTION
+Long description
+
+.PARAMETER Project
+Parameter description
+
+.PARAMETER Username
+Parameter description
+
+.EXAMPLE
+An example
+
+.NOTES
+#TODO: Finish this function.
+#>
 function Add-ProjectMember {
     Param (
         [Parameter(Mandatory=$true)][string]$Project,
