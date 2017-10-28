@@ -95,7 +95,7 @@ function Add-ProjectMember {
     Used to add a user without an RIT email.
 
     .EXAMPLE
-    Add-RITSecADUser -FirstName Joe -LastName Graham jxg5678@g.rit.edu
+    Add-RITSecADUser -FirstName Joe -LastName Graham -Email jxg5678@g.rit.edu
 
     .NOTES
     Current Configuration:
