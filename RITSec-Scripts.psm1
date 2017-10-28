@@ -46,23 +46,23 @@ function Add-User {
 }
 
 <#
-.SYNOPSIS
-Short description
+    .SYNOPSIS
+    Short description
 
-.DESCRIPTION
-Long description
+    .DESCRIPTION
+    Long description
 
-.PARAMETER Project
-Parameter description
+    .PARAMETER Project
+    Parameter description
 
-.PARAMETER Username
-Parameter description
+    .PARAMETER Username
+    Parameter description
 
-.EXAMPLE
-An example
+    .EXAMPLE
+    An example
 
-.NOTES
-#TODO: Finish this function.
+    .NOTES
+    #TODO: Finish this function.
 #>
 function Add-ProjectMember {
     Param (
