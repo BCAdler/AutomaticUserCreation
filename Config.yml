@@ -1,0 +1,9 @@
+Domain:
+    Name: domain # Domain Name
+    UserContainer: OU=Users,OU=Main,DC=domain,DC=tld  # OU where users should be created
+    UPNSuffix: '@domain.tld' # User Principle Name Suffix
+    DefaultUserGroups: # Default groups to add users to
+        - VPN Users
+vCenter:
+    RoleName: 'User' # Role to use for user permissions
+    ParentUserFolder: 'User Folders' # Parent folder to add user folders under
