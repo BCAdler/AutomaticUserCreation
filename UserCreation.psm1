@@ -8,6 +8,38 @@
 
 <#
     .SYNOPSIS
+    Creates a variable named $ISTS in the global scope to use for configuration.
+
+    .DESCRIPTION
+    Creates a variable named $ISTS in the global scope to use for configuration.
+    The variable is a YAML object that is created from the config file it is given.
+
+    .PARAMETER ConfigFile
+    The path of the configuration file to load.  Defaults to <Modulepath>\ISTS-Config.yaml
+
+    .EXAMPLE
+    Import-ISTSYAMLConfig
+
+    .EXAMPLE
+    Import-ISTSYAMLConfig -ConfigFile ../ISTS-Config.yaml
+
+    .NOTES
+    General notes
+#>
+function Import-YAMLConfig {
+    Param (
+        [string]$ConfigFile = "$($UserCreationModulePath)\Config.yml"
+    )
+    $YAMLConfig = Get-Yaml -FromFile $ConfigFile
+
+    # Set $YAMLConfig as a global variable so it can be accessed globally
+    Set-Variable -Name YAMLConfig -Value $YAMLConfig -Scope Global -Force
+
+    Write-Host "Variable `"`$YAMLConfig`" created in the global scope."
+}
+
+<#
+    .SYNOPSIS
     Automates adding of new users to the RITSec Infrastructure.
 
     .DESCRIPTION
@@ -43,6 +75,53 @@ function Add-User {
 
     # Creates a vApp for the user.
     Add-ResourcePool -UserName $UserName -ErrorAction Stop
+}
+
+<#
+    .SYNOPSIS
+    Short description
+
+    .DESCRIPTION
+    Long description
+
+    .PARAMETER InputCsv
+    Parameter description
+
+    .EXAMPLE
+    An example
+
+    .NOTES
+    General notes
+#>
+function Add-UserFromCsv {
+    Param (
+        [Parameter(Mandatory=$true)][string]$InputCsv
+    )
+
+    try {
+        Test-Path -Path $InputCsv
+    }
+    catch {
+        Write-Error -Message "File `"$InputCsv`" Not Found."
+        return
+    }
+
+    $Csv = Import-Csv -Path $InputCsv
+    $Users = @()
+    foreach($User in $Csv) {
+        # Parse input for vApp Name
+        $UserName = $User.FirstName[0] + $User.LastName
+    
+        # Create user account in AD
+        $TempPass = Add-CCDCADUser -FirstName $User.FirstName -LastName $User.LastName -Email $User.Email -ErrorAction Stop
+    
+        # Creates a Resource Pool and Folder for the user.
+        Add-ResourcePool -UserName $UserName -ErrorAction Stop
+
+        $User = $User | Add-Member @{"Password"=$TempPass} -PassThru
+        $Users += $User
+    }
+    $Users | Export-Csv -Path .\Output.csv -Force -NoTypeInformation
 }
 
 <#
