@@ -6,6 +6,8 @@
     Author: Brandon Adler
 #>
 
+Set-Variable -Name "UserCreationModulePath" -Scope Global -Value (Split-Path -Parent $PSCommandPath)
+
 <#
     .SYNOPSIS
     Creates a variable named $ISTS in the global scope to use for configuration.
