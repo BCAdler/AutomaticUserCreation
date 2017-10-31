@@ -1,7 +1,7 @@
 #Requires -Version 4.0
 <#
-    RITSec-Scripts.psm1 - Scripts to help in the automation of user account
-    creation as well as general automation of the RITSec Cluster.
+    UserCreation.psm1 - Scripts to help in the automation of user account
+    creation as well as general automation of multiple infrastructures.
 
     Author: Brandon Adler
 #>
